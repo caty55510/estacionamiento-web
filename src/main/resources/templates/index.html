@@ -1,0 +1,131 @@
+<!DOCTYPE html>S
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Estacionamiento Inteligente</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/estilos.css" rel="stylesheet">
+</head>
+<body class="bg-dark text-light">
+
+    <div class="container my-4">
+        <div class="p-4 mb-4 rounded border border-secondary text-center bg-secondary bg-opacity-10">
+            <h1 class="display-5 fw-bold" style="color: #c5a880;">Sistema de Estacionamiento Inteligente</h1>
+            <p class="lead text-muted">Control y gestión de espacios vehiculares (Tarifa actual: $<span th:text="${precioHora}">600</span> / hora)</p>
+        </div>
+
+        <div th:if="${mensajeExito}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <span th:text="${mensajeExito}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${mensajeError}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${mensajeError}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <div class="card p-4 bg-secondary bg-opacity-10 border border-secondary text-light h-100">
+                    <h2>Registrar Ingreso</h2>
+                    <form th:action="@{/ingreso}" method="post">
+                        <div class="mb-3">
+                            <label class="form-label">Patente del Vehículo:</label>
+                            <input type="text" name="patente" class="form-control bg-dark text-light border-secondary" placeholder="Ej: AB123CD" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Tipo de Vehículo:</label>
+                            <select name="tipoVehiculo" class="form-select bg-dark text-light border-secondary">
+                                <option value="AUTO">AUTO</option>
+                                <option value="MOTO">MOTO</option>
+                                <option value="CAMIONETA">CAMIONETA</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-warning w-100 fw-bold">Ingresar Vehículo</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card p-4 bg-secondary bg-opacity-10 border border-secondary text-light h-100">
+                    <h2>Registrar Salida / Cobro</h2>
+                    <form th:action="@{/salida}" method="post">
+                        <div class="mb-3">
+                            <label class="form-label">ID de Ticket:</label>
+                            <input type="number" name="idTicket" class="form-control bg-dark text-light border-secondary" placeholder="Ej: 1" required>
+                        </div>
+                        <button type="submit" class="btn btn-warning w-100 fw-bold mt-4">Procesar Salida</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="card p-4 mb-4 bg-secondary bg-opacity-10 border border-secondary text-light">
+            <h2 class="mb-3">Estado Actual de los Lugares</h2>
+            <div class="d-flex flex-wrap gap-2">
+                <div th:each="lugar : ${lugares}" 
+                     class="p-2 rounded text-center border"
+                     th:style="${lugar.estado.name() == 'LIBRE'} ? 'background-color: rgba(20, 83, 45, 0.4); border-color: #166534; color: #4ade80; width: 130px;' : 'background-color: rgba(127, 29, 29, 0.4); border-color: #991b1b; color: #f87171; width: 130px;'">
+                    <h5 class="m-0 fw-bold" th:text="${lugar.codigo}">L-01</h5>
+                    <small th:text="'ID: ' + ${lugar.idLugar} + ' | ' + ${lugar.tipoPermitido}">AUTO</small>
+                    <p class="m-0 mt-1"><strong th:text="${lugar.estado}">LIBRE</strong></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card p-4 bg-secondary bg-opacity-10 border border-secondary text-light h-100">
+                    <h2>Agregar Lugar</h2>
+                    <form th:action="@{/lugar/agregar}" method="post">
+                        <div class="mb-3">
+                            <label class="form-label">Código del Lugar:</label>
+                            <input type="text" name="codigo" class="form-control bg-dark text-light border-secondary" placeholder="Ej: L-21" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Tipo Permitido:</label>
+                            <select name="tipoPermitido" class="form-select bg-dark text-light border-secondary">
+                                <option value="AUTO">AUTO</option>
+                                <option value="MOTO">MOTO</option>
+                                <option value="CAMIONETA">CAMIONETA</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-warning w-100 fw-bold">Crear Lugar</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card p-4 bg-secondary bg-opacity-10 border border-secondary text-light h-100">
+                    <h2>Eliminar Lugar</h2>
+                    <form th:action="@{/lugar/eliminar}" method="post">
+                        <div class="mb-3">
+                            <label class="form-label">ID del Lugar a Eliminar:</label>
+                            <input type="number" name="idLugar" class="form-control bg-dark text-light border-secondary" placeholder="Ej: 5" required>
+                        </div>
+                        <button type="submit" class="btn btn-danger w-100 fw-bold mt-4">Eliminar Lugar</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card p-4 bg-secondary bg-opacity-10 border border-secondary text-light h-100">
+                    <h2>Modificar Precio</h2>
+                    <form th:action="@{/precio/actualizar}" method="post">
+                        <div class="mb-3">
+                            <label class="form-label">Nuevo Precio ($):</label>
+                            <input type="number" step="0.01" name="nuevoPrecio" class="form-control bg-dark text-light border-secondary" placeholder="Ej: 800" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Contraseña:</label>
+                            <input type="password" name="password" class="form-control bg-dark text-light border-secondary" placeholder="Contraseña" required>
+                        </div>
+                        <button type="submit" class="btn btn-warning w-100 fw-bold">Actualizar Tarifa</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
